@@ -23,7 +23,8 @@ class Spreadsheet:
         # Insert your Member
         #   variables here (if any):
         #----------------------
-        
+        self.undo_stack=[]
+        self.redo_stack=[]
         
         #======================
         
@@ -41,8 +42,15 @@ class Spreadsheet:
         Return value:
             None
         '''
+        rowlist=[]
+        for i in range(rows):
+            collist=[]
+            for j in range(cols):
+                collist.append(None)
+            rowlist.append(collist)
         
-        raise NotImplementedError
+        self.sheet=rowlist
+        #raise NotImplementedError
 #======================
 
 #======================
@@ -58,8 +66,11 @@ class Spreadsheet:
         Return value:
             None
         '''
-        
-        raise NotImplementedError
+        if self.sheet!=None:
+            self.cursor=[row,col]
+        else:
+            print("Sheet not created yet")
+        #raise NotImplementedError
 #======================
 
 #======================        
@@ -73,8 +84,11 @@ class Spreadsheet:
         Return value:
             None
         '''
-        
-        raise NotImplementedError
+        if self.sheet!=None:
+            self.sheet[self.cursor[0]][self.cursor[1]]=val
+        else:
+            print("Sheet not created")
+        #raise NotImplementedError
 #======================
 
 #======================        
@@ -88,8 +102,8 @@ class Spreadsheet:
         Return value:
             None
         '''
-
-        raise NotImplementedError
+        self.sheet[self.cursor[0]][self.cursor[1]]=None
+        #raise NotImplementedError
 #======================
 
 #======================    
@@ -104,8 +118,9 @@ class Spreadsheet:
             value stored at the cursor location 
 
         '''
-        
-        raise NotImplementedError
+        print(self.sheet[self.cursor[0]][self.cursor[1]])
+        return self.sheet[self.cursor[0]][self.cursor[1]]
+        #raise NotImplementedError
 #======================
 
 #======================    
@@ -120,8 +135,11 @@ class Spreadsheet:
         Return value:
             None
         '''
-
-        raise NotImplementedError
+        self.selction[0]=self.cursor[0]
+        self.selction[1]=self.cursor[1]
+        self.selction[2]=row
+        self.selction[3]=col
+        #raise NotImplementedError
 #======================
 
 #======================        
@@ -140,7 +158,7 @@ class Spreadsheet:
             
             Example: (1,1,3,4)
         '''
-        
+        self
         raise NotImplementedError
 #======================
 
