@@ -25,7 +25,7 @@ class Spreadsheet:
         #----------------------
         self.undo_stack=[]
         self.redo_stack=[]
-        
+        self.selected_vals=[]
         #======================
         
 #======================
@@ -66,10 +66,13 @@ class Spreadsheet:
         Return value:
             None
         '''
-        if self.sheet!=None:
-            self.cursor=[row,col]
-        else:
-            print("Sheet not created yet")
+        try:
+            if self.sheet!=None:
+                self.cursor=[row,col]
+            else:
+                print("Sheet not created yet")
+        except:
+            print("Out of Bound error")
         #raise NotImplementedError
 #======================
 
@@ -139,6 +142,11 @@ class Spreadsheet:
         self.selction[1]=self.cursor[1]
         self.selction[2]=row
         self.selction[3]=col
+        selection_tuple=()
+        for i in range(self.selction[0],self.selction[2]+1):
+            for j in range(self.selction[1],self.selction[3]+1):
+                selection_tuple+=(self.sheet[i][j])
+        self.selected_vals=selection_tuple
         #raise NotImplementedError
 #======================
 
@@ -158,8 +166,9 @@ class Spreadsheet:
             
             Example: (1,1,3,4)
         '''
-        self
-        raise NotImplementedError
+        return tuple(self.selction)
+
+        #raise NotImplementedError
 #======================
 
 #======================        
@@ -173,8 +182,8 @@ class Spreadsheet:
         Return value:
             None
         '''
-        
-        raise NotImplementedError
+        self.sheet[row][col]=sum(self.selected_vals)
+        #raise NotImplementedError
 #======================
 
 #======================    
@@ -188,8 +197,11 @@ class Spreadsheet:
         Return value:
             None
         '''   
-             
-        raise NotImplementedError
+        prod=1
+        for i in self.selected_vals:
+            prod=prod*i
+        self.sheet[row][col]=prod    
+        #raise NotImplementedError
 #======================
 
 #======================        
@@ -203,8 +215,8 @@ class Spreadsheet:
         Return value:
             None
         '''
-           
-        raise NotImplementedError
+        self.sheet[row][col]=sum(self.selected_vals)/len(self.selected_vals)   
+        #raise NotImplementedError
 #======================
 
 #======================
@@ -218,8 +230,8 @@ class Spreadsheet:
         Return value:
             None
         '''        
-        
-        raise NotImplementedError
+        self.sheet[row][col]=max(self.selected_vals)
+        #raise NotImplementedError
 #======================
 
 #======================
@@ -240,8 +252,14 @@ class Spreadsheet:
             3                   12
             4 
         '''
-        
-        raise NotImplementedError
+        for i in self.sheet: 
+            for j in i:
+                if j!=None:
+                    print(j,end="\t")
+                else:
+                    print("_",end="\t")
+            print()
+       #raise NotImplementedError
 #======================
 
             
@@ -326,14 +344,26 @@ def main():
     # Implement your own logic here:
     # -----------------------------
     sheet = Spreadsheet()
-    # sheet.CreateSheet(5,5)
+    sheet.CreateSheet(7,7)
     #
-    # while True:
-    #     sheet.Goto(2,2)
-    #     sheet.insert(4)
-    #     sheet.Print()
+    while True:
+        sheet.Goto(0,0)
+        sheet.Insert(4)
+        sheet.Goto(1,1)
+        sheet.Insert(5)
+        sheet.Goto(2,6)
+        sheet.Insert(6)
+        sheet.PrintSheet()
+        break
     
-
+def display_ui():
+    print("0 to Quit")
+    print("1 to Go to New Cell")
+    print("2 to Insert at Current Cell")
+    print("3 to Delete Value of Current Cell")
+    print("4 to Read Current Cell")
+    print("5 to Create New Selection")
+    print("6 to Read Current Selection")
 if __name__ == '__main__':
     main()
     
