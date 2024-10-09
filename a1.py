@@ -5,7 +5,7 @@
 # Section: C
 #===================================
 #===================================
-
+import pickle
 class Spreadsheet:
     def __init__(self):
         '''
@@ -142,11 +142,12 @@ class Spreadsheet:
         self.selction[1]=self.cursor[1]
         self.selction[2]=row
         self.selction[3]=col
-        selection_tuple=()
+        selection_list=[]
         for i in range(self.selction[0],self.selction[2]+1):
             for j in range(self.selction[1],self.selction[3]+1):
-                selection_tuple+=(self.sheet[i][j])
-        self.selected_vals=selection_tuple
+                if self.sheet[i][j]!=None:
+                    selection_list.append(self.sheet[i][j])
+        self.selected_vals=selection_list
         #raise NotImplementedError
 #======================
 
@@ -339,23 +340,6 @@ class Spreadsheet:
 #
 #======================
 
-def main():
-    # -----------------------------
-    # Implement your own logic here:
-    # -----------------------------
-    sheet = Spreadsheet()
-    sheet.CreateSheet(7,7)
-    #
-    while True:
-        sheet.Goto(0,0)
-        sheet.Insert(4)
-        sheet.Goto(1,1)
-        sheet.Insert(5)
-        sheet.Goto(2,6)
-        sheet.Insert(6)
-        sheet.PrintSheet()
-        break
-    
 def display_ui():
     print("0 to Quit")
     print("1 to Go to New Cell")
@@ -364,6 +348,37 @@ def display_ui():
     print("4 to Read Current Cell")
     print("5 to Create New Selection")
     print("6 to Read Current Selection")
+    print("7 to Add Sum of Current Selection to Current Cell")
+    print("8 to Add Product of Current Selection to Current Cell")
+    print("9 to Add Average of Current Selection to Current Cell")
+    print("10 to Add Maximum of Current Selection to Current Cell")
+    print("11 to Print Sheet")
+
+    
+
+def main():
+    # -----------------------------
+    # Implement your own logic here:
+    # -----------------------------
+    sheet = Spreadsheet()
+    sheet.CreateSheet(7,10)
+    #
+    while True:
+        sheet.Goto(0,0)
+        sheet.Insert(4)
+        sheet.Goto(1,1)
+        sheet.Insert(5)
+        sheet.Goto(2,6)
+        sheet.Insert(6)
+        sheet.Goto(0,0)
+        sheet.Select(2,2)
+        sheet.Sum(5,5)
+        sheet.Goto(0,5)
+        sheet.Select(5,6)
+        sheet.Sum(0,0)
+        sheet.PrintSheet()
+        break
+
 if __name__ == '__main__':
     main()
     
