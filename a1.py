@@ -6,6 +6,7 @@
 #===================================
 #===================================
 import pickle
+import copy
 class Spreadsheet:
     def __init__(self):
         '''
@@ -268,7 +269,15 @@ class Spreadsheet:
 #======================
 #    BONUS
 #======================
+    def undo_stack_append(self):
+        self.undo_stack.append(copy.deepcopy(self))
+    def undo_stack_pop(self):
+        self.undo_stack.pop()
     def Undo(self):
+        if len(self.undo_stack)<1:
+            print("Stack empty")
+        else:
+            self.__dict__=self.undo_stack.pop().__dict__
         '''
         Undoes the previous action by user.
  
