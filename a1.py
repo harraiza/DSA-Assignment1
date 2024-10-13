@@ -51,6 +51,7 @@ class Spreadsheet:
             rowlist.append(collist)
         
         self.sheet=rowlist
+        self.undo_stack_append()
         #raise NotImplementedError
 #======================
 
@@ -74,6 +75,7 @@ class Spreadsheet:
                 print("Sheet not created yet")
         except:
             print("Out of Bound error")
+        
         #raise NotImplementedError
 #======================
 
@@ -89,9 +91,11 @@ class Spreadsheet:
             None
         '''
         if self.sheet!=None:
+            self.undo_stack_append()
             self.sheet[self.cursor[0]][self.cursor[1]]=val
         else:
             print("Sheet not created")
+        
         #raise NotImplementedError
 #======================
 
@@ -106,7 +110,9 @@ class Spreadsheet:
         Return value:
             None
         '''
+        self.undo_stack_append()
         self.sheet[self.cursor[0]][self.cursor[1]]=None
+        
         #raise NotImplementedError
 #======================
 
@@ -184,7 +190,9 @@ class Spreadsheet:
         Return value:
             None
         '''
+        self.undo_stack_append()
         self.sheet[row][col]=sum(self.selected_vals)
+        
         #raise NotImplementedError
 #======================
 
@@ -202,7 +210,9 @@ class Spreadsheet:
         prod=1
         for i in self.selected_vals:
             prod=prod*i
+        self.undo_stack_append()
         self.sheet[row][col]=prod    
+        
         #raise NotImplementedError
 #======================
 
@@ -217,7 +227,9 @@ class Spreadsheet:
         Return value:
             None
         '''
+        self.undo_stack_append()
         self.sheet[row][col]=sum(self.selected_vals)/len(self.selected_vals)   
+        
         #raise NotImplementedError
 #======================
 
@@ -232,7 +244,11 @@ class Spreadsheet:
         Return value:
             None
         '''        
+        
+        self.undo_stack_append()
         self.sheet[row][col]=max(self.selected_vals)
+
+        
         #raise NotImplementedError
 #======================
 
@@ -271,13 +287,19 @@ class Spreadsheet:
 #======================
     def undo_stack_append(self):
         self.undo_stack.append(copy.deepcopy(self))
-    def undo_stack_pop(self):
-        self.undo_stack.pop()
+
+    def redo_stack_append(self):
+        self.redo_stack.append(copy.deepcopy(self))
+
     def Undo(self):
         if len(self.undo_stack)<1:
             print("Stack empty")
         else:
+            self.redo_stack_append()
+            copystack=self.redo_stack
             self.__dict__=self.undo_stack.pop().__dict__
+            self.redo_stack=copystack
+            
         '''
         Undoes the previous action by user.
  
@@ -289,11 +311,18 @@ class Spreadsheet:
 
         '''
         
-        raise NotImplementedError
+        #raise NotImplementedError
 
 #----------------------
 
+
     def Redo(self):
+        if len(self.redo_stack)<1:
+            print("Stack empty")
+        else:
+            self.undo_stack_append()
+            self.__dict__=self.redo_stack.pop().__dict__
+
         '''
         Redoes the previous action undone by user.
  
@@ -305,7 +334,7 @@ class Spreadsheet:
 
         '''
         
-        raise NotImplementedError
+        #raise NotImplementedError
 
 #----------------------
 
@@ -320,8 +349,14 @@ class Spreadsheet:
             None 
 
         '''
-        
-        raise NotImplementedError
+        try: 
+            with open (f"{fileName}.txt","wb") as file:
+                self.redo_stack=[]
+                self.undo_stack=[]
+                pickle.dump(self,file)
+        except:
+            print("File not saved")
+        #raise NotImplementedError
 
 #----------------------
 
@@ -336,8 +371,12 @@ class Spreadsheet:
             None 
 
         '''
-        
-        raise NotImplementedError
+        try: 
+            with open (f"{fileName}.txt","rb") as file:
+                self.__dict__=pickle.load(file).__dict__
+        except:
+            print("File not loaded")
+        #raise NotImplementedError
                 
 #======================
 
@@ -362,32 +401,74 @@ def display_ui():
     print("9 to Add Average of Current Selection to Current Cell")
     print("10 to Add Maximum of Current Selection to Current Cell")
     print("11 to Print Sheet")
-
-    
+    print("12 to Undo")
+    print("13 to Redo")
+    print("14 to Save File")
+    print("15 to Load File")
+    option=input("Enter option:")
+    return option
 
 def main():
     # -----------------------------
     # Implement your own logic here:
     # -----------------------------
     sheet = Spreadsheet()
-    sheet.CreateSheet(7,10)
+    x=int(input("enter sheet width"))
+    y=int(input("enter sheet height"))
+    sheet.CreateSheet(x,y)
     #
     while True:
-        sheet.Goto(0,0)
-        sheet.Insert(4)
-        sheet.Goto(1,1)
-        sheet.Insert(5)
-        sheet.Goto(2,6)
-        sheet.Insert(6)
-        sheet.Goto(0,0)
-        sheet.Select(2,2)
-        sheet.Sum(5,5)
-        sheet.Goto(0,5)
-        sheet.Select(5,6)
-        sheet.Sum(0,0)
-        sheet.PrintSheet()
-        break
-
+        option=display_ui()
+        if option=="1":
+            x=int(input("enter cell row: "))
+            y=int(input("enter sheet column: "))
+            sheet.Goto(x,y)
+        elif option=="0":
+            print("Quiting")
+            break
+        elif option=="2":
+            val=int(input("enter value: "))
+            sheet.Insert(val)
+        elif option=="3":
+            sheet.Delete()
+        elif option=="4":
+            sheet.ReadVal()
+        elif option=="5":
+            nx=int(input("enter cell row(should be greater than the current cell): "))
+            ny=int(input("enter cell column(should be greater than the current cell): "))
+            sheet.Select(nx,ny)
+        elif option=="7":
+            nx=int(input("enter cell row: "))
+            ny=int(input("enter cell column: "))
+            sheet.Sum(nx,ny)
+        elif option=="6":
+            print(sheet.GetSelection())
+        elif option=="8":
+            nx=int(input("enter cell row: "))
+            ny=int(input("enter cell column: "))
+            sheet.Mul(nx,ny)
+        elif option=="9":
+            nx=int(input("enter cell row: "))
+            ny=int(input("enter cell column: "))
+            sheet.Avg()
+        elif option=="10":
+            nx=int(input("enter cell row: "))
+            ny=int(input("enter cell column: "))
+            sheet.Max(nx,ny)
+        elif option=="11":
+            sheet.PrintSheet()
+        elif option=="12":
+            sheet.Undo()
+        elif option=="13":
+            sheet.Redo
+        elif option=="14":
+            file=input("enter file name: ")
+            sheet.Save(file)
+        elif option=="15":
+            file=input("enter file name: ")
+            sheet.Load(file)
+        else:
+            print("option invalid")
 if __name__ == '__main__':
     main()
     
